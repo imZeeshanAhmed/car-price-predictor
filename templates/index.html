@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Car Price Predictor</title>
+
+    <!-- ONLY YOUR CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Font Awesome (optional but used in your labels) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+
+    <!-- jQuery (not required but safe if you use later) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+
+        <div class="page-badge">
+            <span class="dot"></span>
+            AI Powered Prediction
+        </div>
+
+        <h1>Car Price <span>Predictor</span></h1>
+
+        <div class="section-label">Vehicle Information</div>
+
+        <form id="prediction-form" method="post">
+
+            <!-- COMPANY -->
+            <div class="form-group">
+                <label><i class="fas fa-building"></i> Company</label>
+                <div class="select-wrap">
+                    <select class="form-control" id="company" name="company" required>
+                        <option value="">Select Company</option>
+                        {% for company in companies %}
+                        <option value="{{ company }}">{{ company }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- MODEL -->
+            <div class="form-group">
+                <label><i class="fas fa-car"></i> Model</label>
+                <div class="select-wrap">
+                    <select class="form-control" id="car_models" name="car_models" required>
+                        <option value="">Select Model</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- YEAR + FUEL -->
+            <div class="row-2">
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar"></i> Year</label>
+                    <div class="select-wrap">
+                        <select class="form-control" id="year" name="year" required>
+                            <option value="">Select Year</option>
+                            {% for year in years %}
+                            <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-gas-pump"></i> Fuel</label>
+                    <div class="select-wrap">
+                        <select class="form-control" id="fuel_type" name="fuel_type" required>
+                            <option value="">Select Fuel Type</option>
+                            {% for fuel in fuel_types %}
+                            <option value="{{ fuel }}">{{ fuel }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KM -->
+            <div class="form-group">
+                <label><i class="fas fa-road"></i> Kilometers Driven</label>
+                <input type="number" class="form-control" id="kilo_driven"
+                       name="kilo_driven" placeholder="Enter kilometers driven" min="0" required>
+            </div>
+
+            <div class="fx-divider">AI Price Estimation</div>
+
+            <button type="submit" class="btn-primary">Predict Price</button>
+
+        </form>
+
+        <!-- RESULT -->
+        <div class="result-panel" id="result-panel">
+
+            <div class="result-progress">
+                <div class="result-progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="result-body">
+
+                <div>
+                    <div class="result-tag">Estimated Price</div>
+
+                    <div class="result-price">
+                        <span class="rupee">₹</span>
+                        <span id="prediction">--</span>
+                    </div>
+                </div>
+
+                <div class="pill pill-blue">AI Generated</div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // model filtering
+    const allModels = JSON.parse('{{ car_models | tojson | safe }}');
+
+    document.getElementById("company").addEventListener("change", function () {
+
+        let company = this.value;
+        let modelSelect = document.getElementById("car_models");
+
+        modelSelect.innerHTML = "<option value=''>Select Model</option>";
+
+        if (!company) return;
+
+        let filtered = allModels.filter(m =>
+            m.toLowerCase().includes(company.toLowerCase())
+        );
+
+        filtered.forEach(model => {
+            let opt = document.createElement("option");
+            opt.value = model;
+            opt.innerHTML = model;
+            modelSelect.appendChild(opt);
+        });
+    });
+
+    // prediction request
+    document.getElementById('prediction-form').addEventListener('submit', send_data);
+
+    function send_data(event) {
+        event.preventDefault();
+
+        let form = document.getElementById('prediction-form');
+        let fd = new FormData(form);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/predict', true);
+
+        document.getElementById('result-panel').classList.add('show');
+        document.getElementById('prediction').innerHTML = "Predicting...";
+        document.getElementById('progress-bar').style.width = "70%";
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    document.getElementById('prediction').innerHTML = xhr.responseText;
+                    document.getElementById('progress-bar').style.width = "100%";
+                } else {
+                    document.getElementById('prediction').innerHTML = "Prediction Failed";
+                    document.getElementById('progress-bar').style.width = "0%";
+                }
+            }
+        };
+
+        xhr.send(fd);
+    }
+</script>
+
+</body>
+</html>

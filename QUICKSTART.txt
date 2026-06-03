@@ -1,0 +1,62 @@
+# 🚀 DEPLOY IN 5 MINUTES
+
+## ⚡ Quick Steps:
+
+### 1️⃣ Create GitHub Account & Repository
+- Go to github.com, sign up
+- Create new repo called `car-price-predictor`
+
+### 2️⃣ Push Your Code
+Open terminal/command prompt in your project folder:
+```
+git init
+git add .
+git commit -m "Deploy car price predictor"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/car-price-predictor.git
+git push -u origin main
+```
+
+### 3️⃣ Deploy on Render (Easiest!)
+1. Go to render.com
+2. Sign in with GitHub
+3. Click "New" → "Web Service"
+4. Select your `car-price-predictor` repository
+5. Settings:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+6. Click "Create Web Service"
+7. ⏳ Wait 2-3 minutes...
+8. 🎉 Your link appears at top!
+
+### 4️⃣ Test It!
+- Open your Render URL
+- Try: Toyota → Corolla → 2015 → Petrol → 50000 km
+- Should show: ₹561,072.09
+
+---
+
+## 📋 Pre-Deployment Checklist:
+
+✅ app.py (modified for production)
+✅ requirements.txt (with gunicorn)
+✅ Procfile (deployment config)
+✅ runtime.txt (Python version)
+✅ templates/ folder
+✅ static/ folder
+✅ Cleaned_Car_data.csv
+✅ LinearRegressionModel.pkl
+
+---
+
+## 🔗 Live URL Format:
+After deployment: `https://car-price-predictor-xxxx.onrender.com`
+
+Share this URL in your viva! 🎓
+
+---
+
+## 💡 Pro Tips:
+- Free tier of Render spins down after 15 min of inactivity (takes ~30 sec to wake up)
+- If you want faster response, upgrade to paid ($7/month)
+- Share the link before viva to show it's working!
